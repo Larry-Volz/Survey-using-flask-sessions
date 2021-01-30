@@ -3,7 +3,7 @@
 
     <h5 class="card-title">{{  survey_title }}</h5>
     <div class="card-subtitle">{{ survey_instructions}}</div>
-    <form action="/questions/0" class="form" method="POST">
+    <form action="/session_start" class="form" method="POST">
         <input type="text" name="current_question" value="0" style="display: none;">
         <button type="submit" class="btn btn-success m-1 mt-2">Start Survey</button>
     </form>

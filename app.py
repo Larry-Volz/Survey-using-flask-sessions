@@ -1,5 +1,5 @@
 from surveys import *
-from flask import Flask, request, render_template, redirect, flash
+from flask import Flask, request, render_template, redirect, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
 app=Flask(__name__)
@@ -19,9 +19,6 @@ choices = [question.choices for question in satisfaction_survey.questions]
 for i in range(len(questions)):
     print(questions[i])
 
-# for i in range(len(satisfaction_survey.questions)):
-#     print(satisfaction_survey.questions.question.values())
-
 question_idx = 0
 counter = 0
 TOTAL_NUM_QUESTIONS=len(questions)
@@ -36,17 +33,23 @@ def survey_start_page():
         question_idx = 0
     return render_template('index.html', survey_title=title, survey_instructions=instructions)
 
+@app.route('/session_start', methods=["POST"])
+def session_start_page():
+    """to set up session variable - arrived via form in index.html"""
+    session['responses']=[]
+    return redirect('/questions/0')
 
 @app.route('/questions/<int:question_idx>', methods=["GET","POST"])
 def questions_page(question_idx):
     global TOTAL_NUM_QUESTIONS
     global questions
-    print(f"question_idx: {question_idx}")
+    # print(f"question_idx: {question_idx}")
 
-    if question_idx != len(responses):
-        #FLASH 'incorrect address: please answer all the questions in order
+    print(f"question_idx: {question_idx},TOTAL_NUM_QUESTIONS: {TOTAL_NUM_QUESTIONS}, len(responses): {len(responses)}")
+
+    if question_idx != len(session['responses']):
         flash("incorrect address: please answer all the questions in order", 'error')
-        question_idx = len(responses)
+        question_idx = len(session['responses'])
         redirect('/questions/<int:question_idx>')
 
     if question_idx < TOTAL_NUM_QUESTIONS:
@@ -61,10 +64,17 @@ def questions_page(question_idx):
 def answer_page():
     # UPDATE RESPONSES HERE
     global question_idx
+
+    #UPDATE SESSION USING RESPONSES AS A TEMP (LOCAL) VARIABLE
+    responses = session['responses']
     responses.append(request.form["response"])
-    question_idx = len(responses)
-    print(f"/questions/{question_idx}")
+    session['responses'] = responses
+
+    question_idx = len(session['responses'])
+    # print(f"question_idx: {question_idx}")
+
     return redirect (f"/questions/{question_idx}")
+
 
 @app.route('/thank_you')
 def thank_you():
