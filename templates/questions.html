@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block inherited_content %}
+
+    <h5 class="card-title">{{  survey_title }}</h5>
+    <div class="card-subtitle">{{ survey_instructions}}</div>
+    <p class="card-text">
+        {% for msg in get_flashed_messages() %}  
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+             
+        {% endfor %}
+    </p>
+    <form action="/answer" class="form" method="POST">
+        <!-- show choices here -->
+        {{ current_question }}
+
+        <div class="row">
+            <div class="col">
+                {% for choice in choices%}
+                    <input type="radio"id="response" name="response" value= "{{ choice }}" checked>
+                    <label for="response">{{ choice }}</label>
+                {% endfor %}
+            <button type="submit" class="btn btn-success m-1 mt-2">Enter</button>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
